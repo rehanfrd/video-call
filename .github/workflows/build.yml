@@ -15,35 +15,21 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         
+    # 🔥 Yahan latest stable Flutter use hoga (No Kotlin/AGP errors anymore) 🔥
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.6'
         channel: 'stable'
 
-    - name: Clean, Create & Fix Versions
+    - name: Clean & Create Android
       run: |
         rm -rf android
         flutter create --project-name zing_call --platforms android .
-        
-        # 🔥 AGP 7.3.1 FIX (Ye current error fix karega) 🔥
-        sed -i -E 's/version "7.3.0" apply false/version "7.3.1" apply false/g' android/settings.gradle || true
-        
-        # 🔥 KOTLIN 2.1.0 FIX 🔥
-        sed -i -E 's/id "org.jetbrains.kotlin.android" version ".*" apply false/id "org.jetbrains.kotlin.android" version "2.1.0" apply false/g' android/settings.gradle || true
-        
-        # Minimum SDK 21 Fix
-        sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
-        sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
 
-    - name: Add Zego Permissions
+    - name: Add Safe Permissions (No XML Corruption)
       run: |
-        sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>\n    <uses-permission android:name="android.permission.BLUETOOTH"/>\n    <uses-permission android:name="android.permission.VIBRATE"/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"/>' android/app/src/main/AndroidManifest.xml
+        perl -0777 -pi -e 's/<\/manifest>/\n    <uses-permission android:name="android.permission.INTERNET"\/>\n    <uses-permission android:name="android.permission.CAMERA"\/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"\/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"\/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"\/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"\/>\n    <uses-permission android:name="android.permission.BLUETOOTH"\/>\n    <uses-permission android:name="android.permission.VIBRATE"\/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"\/>\n<\/manifest>/g' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
-
-    - name: Super Fast JCenter Fix
-      run: grep -rl 'jcenter()' ~/.pub-cache/hosted/pub.dev/ | xargs sed -i 's/jcenter()/mavenCentral()/g' || true
-
     - run: flutter build apk --release --no-tree-shake-icons
 
     - uses: actions/upload-artifact@v4
