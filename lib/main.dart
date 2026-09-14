@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ZingCallApp());
 }
 
@@ -49,15 +50,17 @@ class _HomePageState extends State<HomePage> {
           children: [
             const Icon(Icons.video_camera_front_rounded, size: 80, color: Color(0xFF38BDF8)),
             const SizedBox(height: 20),
-            Text('Your User ID: User_$userId', style: const TextStyle(color: Colors.white54)),
+            Text('Your User ID: User_$userId', style: const TextStyle(color: Colors.white54, fontSize: 16)),
             const SizedBox(height: 20),
             TextField(
               controller: callIdController,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'Enter Call ID (e.g., room1)',
+                labelStyle: const TextStyle(color: Colors.white54),
                 filled: true,
                 fillColor: const Color(0xFF1E293B),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
               ),
             ),
             const SizedBox(height: 30),
