@@ -26,10 +26,10 @@ jobs:
 
     - name: Fix Android Configs for ZegoCloud & Flutter 
       run: |
-        # 🔥 Update API to 35 as requested by the latest plugins
+        # 🔥 Update API to 36 as requested by audioplayers_android
         find android -name "build.gradle*" -type f -exec sed -i 's/flutter.minSdkVersion/21/g' {} + || true
-        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.compileSdkVersion/35/g' {} + || true
-        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.targetSdkVersion/35/g' {} + || true
+        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.compileSdkVersion/36/g' {} + || true
+        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.targetSdkVersion/36/g' {} + || true
         
         # Upgrade Kotlin to 2.2.20 as requested by Flutter
         find android -name "settings.gradle*" -type f -exec sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "2.2.20"/g' {} + || true
