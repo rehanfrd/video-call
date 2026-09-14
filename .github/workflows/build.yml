@@ -20,14 +20,16 @@ jobs:
         flutter-version: '3.19.6'
         channel: 'stable'
 
-    - name: Clean, Create & Fix Kotlin
+    - name: Clean, Create & Fix Versions
       run: |
         rm -rf android
         flutter create --project-name zing_call --platforms android .
         
-        # 🔥 YEH LINE KOTLIN KO 2.1.0 PAR FORCE KAREGI 🔥
+        # 🔥 AGP 7.3.1 FIX (Ye current error fix karega) 🔥
+        sed -i -E 's/version "7.3.0" apply false/version "7.3.1" apply false/g' android/settings.gradle || true
+        
+        # 🔥 KOTLIN 2.1.0 FIX 🔥
         sed -i -E 's/id "org.jetbrains.kotlin.android" version ".*" apply false/id "org.jetbrains.kotlin.android" version "2.1.0" apply false/g' android/settings.gradle || true
-        sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '2.1.0'/g" android/build.gradle || true
         
         # Minimum SDK 21 Fix
         sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
