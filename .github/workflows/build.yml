@@ -15,7 +15,6 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         
-    # 🔥 Wapas Stable version par ja rahe hain taaki AGP 9+ crash na kare
     - uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.19.6'
@@ -26,12 +25,10 @@ jobs:
         rm -rf android
         flutter create --project-name zing_call --platforms android .
 
-    - name: Fix Kotlin & MinSDK
+    - name: Fix MinSDK
       run: |
-        # 🔥 Kotlin 1.9.24 fix (is_lock_screen2 error ke liye)
-        sed -i 's/version "1.7.1"/version "1.9.24"/g' android/settings.gradle
-        # 🔥 MinSDK 21 fix
-        sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle
+        sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
+        sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
 
     - name: Add Permissions
       run: |
@@ -40,9 +37,7 @@ jobs:
     - run: flutter pub get
 
     - name: NUKE JCenter 
-      run: |
-        # 🔥 Yeh command saare Zego packages se JCenter hata degi jo crash karwa raha tha
-        find ~/.pub-cache/hosted/pub.dev/ -name "build.gradle" -type f -exec sed -i 's/jcenter()/mavenCentral()/g' {} +
+      run: find ~/.pub-cache/hosted/pub.dev/ -name "build.gradle" -type f -exec sed -i 's/jcenter()/mavenCentral()/g' {} +
 
     - run: flutter build apk --release --no-tree-shake-icons
 
