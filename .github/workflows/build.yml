@@ -25,23 +25,22 @@ jobs:
         rm -rf android
         flutter create --project-name zing_call --platforms android .
 
-    - name: Fix Kotlin, AGP & MinSDK
+    - name: 🔥 BULLETPROOF FIX: Kotlin, AGP & MinSDK
       run: |
-        # 🔥 Kotlin 2.1.0 Fix
-        sed -i "s/ext.kotlin_version = '1.7.1'/ext.kotlin_version = '2.1.0'/g" android/build.gradle || true
-        sed -i 's/version "1.7.1"/version "2.1.0"/g' android/settings.gradle || true
+        # 1. Update AGP to 7.4.2 (Safely supports new Kotlin)
+        sed -i -E 's/(id "com.android.application" version ")[0-9\.]+(")/\17.4.2\2/' android/settings.gradle || true
         
-        # 🔥 AGP 7.3.1 Fix (Jo Kotlin 2.1.0 ko support karta hai)
-        sed -i "s/gradle:7.3.0/gradle:7.3.1/g" android/build.gradle || true
-        sed -i 's/version "7.3.0"/version "7.3.1"/g' android/settings.gradle || true
+        # 2. Update Kotlin to 2.1.0 (Fixes is_lock_screen2 crash)
+        sed -i -E 's/(id "org.jetbrains.kotlin.android" version ")[0-9\.]+(")/\12.1.0\2/' android/settings.gradle || true
+        sed -i -E "s/(ext.kotlin_version = ')[0-9\.]+(')/\12.1.0\2/" android/build.gradle || true
         
-        # 🔥 MinSDK 21 Fix
+        # 3. Minimum SDK 21
         sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
         sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
 
     - name: Add Permissions
       run: |
-        sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>\n    <uses-permission android:name="android.permission.BLUETOOTH"/>\n    <uses-permission android:name="android.permission.VIBRATE"/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"/>' android/app/src/main/AndroidManifest.xml
+        perl -0777 -pi -e 's/<\/manifest>/\n    <uses-permission android:name="android.permission.INTERNET"\/>\n    <uses-permission android:name="android.permission.CAMERA"\/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"\/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"\/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"\/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"\/>\n    <uses-permission android:name="android.permission.BLUETOOTH"\/>\n    <uses-permission android:name="android.permission.VIBRATE"\/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"\/>\n<\/manifest>/g' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
 
@@ -54,3 +53,4 @@ jobs:
       with:
         name: ZingCall-App
         path: build/app/outputs/flutter-apk/app-release.apk
+        
