@@ -18,24 +18,20 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Setup Android Config
+    - name: Clean & Create Android
       run: |
         rm -rf android
         flutter create --project-name zing_call --platforms android .
-        sed -i -E 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
-        sed -i -E 's/flutter\.compileSdkVersion/35/g' android/app/build.gradle || true
-        sed -i -E 's/minSdk = .*/minSdk = 21/g' android/app/build.gradle || true
-        sed -i -E 's/flutter\.minSdkVersion/21/g' android/app/build.gradle || true
+        
+        # Zego ke liye Minimum SDK 21
+        sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
+        sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
 
-    - name: Add Permissions
+    - name: Add Zego Permissions
       run: |
-        sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>' android/app/src/main/AndroidManifest.xml
+        sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>\n    <uses-permission android:name="android.permission.BLUETOOTH"/>\n    <uses-permission android:name="android.permission.VIBRATE"/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"/>' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
-
-    - name: Strip Bad ZegoCloud Code
-      run: find ~/.pub-cache -name "*.gradle" -type f -exec sed -i 's/jcenter()/mavenCentral()/g' {} +
-
     - run: flutter build apk --release --no-tree-shake-icons
 
     - uses: actions/upload-artifact@v4
