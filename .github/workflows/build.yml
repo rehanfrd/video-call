@@ -15,16 +15,21 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         
-    # 🔥 Pinning to stable Flutter 3.19.6 to avoid AGP 9+ (.kts) crashes
     - uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.19.6'
         channel: 'stable'
 
-    - name: Clean & Create Android
+    - name: Clean, Create & Fix Kotlin
       run: |
         rm -rf android
         flutter create --project-name zing_call --platforms android .
+        
+        # 🔥 YEH LINE KOTLIN KO 2.1.0 PAR FORCE KAREGI 🔥
+        sed -i -E 's/id "org.jetbrains.kotlin.android" version ".*" apply false/id "org.jetbrains.kotlin.android" version "2.1.0" apply false/g' android/settings.gradle || true
+        sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '2.1.0'/g" android/build.gradle || true
+        
+        # Minimum SDK 21 Fix
         sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
         sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
 
@@ -34,8 +39,7 @@ jobs:
 
     - run: flutter pub get
 
-    # 🔥 SUPER FAST JCENTER FIX (Takes only 2 seconds instead of 10 minutes)
-    - name: Strip Bad ZegoCloud Code
+    - name: Super Fast JCenter Fix
       run: grep -rl 'jcenter()' ~/.pub-cache/hosted/pub.dev/ | xargs sed -i 's/jcenter()/mavenCentral()/g' || true
 
     - run: flutter build apk --release --no-tree-shake-icons
