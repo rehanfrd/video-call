@@ -16,13 +16,14 @@ jobs:
         java-version: '17'
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.6' # Yeh line ZegoCloud ke errors ko fix karegi
+        flutter-version: '3.19.6' 
         channel: 'stable'
     
     - name: Setup Android & Permissions
       run: |
         rm -rf android
-        flutter create --platforms android .
+        # Yahan humne explicit project name 'zing_call' add kar diya hai:
+        flutter create --project-name zing_call --platforms android .
         
         # ZegoCloud ke liye minimum SDK config
         sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
