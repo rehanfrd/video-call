@@ -9,7 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zego_uikit_prebuilt_call: 4.1.9
+  # 🔥 Latest version updated here to fix Dart compile errors
+  zego_uikit_prebuilt_call: ^4.24.4
 
 # 🔥 YEH OVERRIDE KOTLIN ERROR KO ROKEGA 🔥
 dependency_overrides:
