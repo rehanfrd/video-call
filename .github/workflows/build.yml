@@ -24,18 +24,12 @@ jobs:
         rm -rf android
         flutter create --project-name zing_call --platforms android .
 
-    - name: Fix Android Configs for ZegoCloud (CompileSDK & Kotlin)
+    - name: Fix Android Configs for ZegoCloud
       run: |
-        # 1. Update minSdk to 21
         find android -name "build.gradle" -type f -exec sed -i 's/flutter.minSdkVersion/21/g' {} + || true
         find android -name "build.gradle" -type f -exec sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' {} + || true
-        
-        # 2. Force CompileSdk to 34 (Crucial for ZegoCloud)
         find android -name "build.gradle" -type f -exec sed -i 's/flutter.compileSdkVersion/34/g' {} + || true
         find android -name "build.gradle" -type f -exec sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 34/g' {} + || true
-        find android -name "build.gradle" -type f -exec sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/g' {} + || true
-        
-        # 3. Update Kotlin Version to 1.9.0 in settings.gradle
         sed -i 's/id "org.jetbrains.kotlin.android" version ".*"/id "org.jetbrains.kotlin.android" version "1.9.0"/g' android/settings.gradle || true
         find android -name "build.gradle" -type f -exec sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.0"/g' {} + || true
 
@@ -44,6 +38,20 @@ jobs:
         perl -0777 -pi -e 's/<\/manifest>/\n    <uses-permission android:name="android.permission.INTERNET"\/>\n    <uses-permission android:name="android.permission.CAMERA"\/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"\/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"\/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"\/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"\/>\n    <uses-permission android:name="android.permission.BLUETOOTH"\/>\n    <uses-permission android:name="android.permission.VIBRATE"\/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"\/>\n<\/manifest>/g' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
+
+    # 🔥 THE MAGIC FIX: Ye automatically saare missing namespaces ko fix kar dega!
+    - name: Fix Missing Namespaces in Pub Cache
+      run: |
+        for manifest in $(find ~/.pub-cache/hosted/pub.dev/ -name AndroidManifest.xml); do
+          dir=$(dirname "$manifest")
+          build_gradle="$dir/build.gradle"
+          if [ -f "$build_gradle" ] && ! grep -q "namespace" "$build_gradle"; then
+            pkg=$(grep -oP 'package="\K[^"]+' "$manifest" | head -n 1)
+            if [ -n "$pkg" ]; then
+              sed -i "/android {/a \    namespace '$pkg'" "$build_gradle"
+            fi
+          fi
+        done
 
     - name: Fix JCenter References
       run: find ~/.pub-cache/hosted/pub.dev/ -name "*.gradle" -type f -exec sed -i 's/jcenter()/mavenCentral()/g' {} + || true
