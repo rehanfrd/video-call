@@ -26,10 +26,10 @@ jobs:
 
     - name: Fix Android Configs for ZegoCloud & Flutter 
       run: |
-        # Fix SDK Versions
+        # 🔥 Update API to 35 as requested by the latest plugins
         find android -name "build.gradle*" -type f -exec sed -i 's/flutter.minSdkVersion/21/g' {} + || true
-        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.compileSdkVersion/34/g' {} + || true
-        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.targetSdkVersion/34/g' {} + || true
+        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.compileSdkVersion/35/g' {} + || true
+        find android -name "build.gradle*" -type f -exec sed -i 's/flutter.targetSdkVersion/35/g' {} + || true
         
         # Upgrade Kotlin to 2.2.20 as requested by Flutter
         find android -name "settings.gradle*" -type f -exec sed -i 's/id "org.jetbrains.kotlin.android" version "[^"]*"/id "org.jetbrains.kotlin.android" version "2.2.20"/g' {} + || true
@@ -62,7 +62,7 @@ jobs:
     - name: Fix JCenter References
       run: find ~/.pub-cache/hosted/pub.dev/ -name "*.gradle" -type f -exec sed -i 's/jcenter()/mavenCentral()/g' {} + || true
 
-    # 🔥 Bypassing Flutter's strict dependency validation
+    # Bypassing Flutter's strict dependency validation
     - run: flutter build apk --release --no-tree-shake-icons --android-skip-build-dependency-validation
 
     - uses: actions/upload-artifact@v4
