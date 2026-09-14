@@ -14,16 +14,17 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
+        
+    # 🔥 Pinning to stable Flutter 3.19.6 to avoid AGP 9+ (.kts) crashes
     - uses: subosito/flutter-action@v2
       with:
+        flutter-version: '3.19.6'
         channel: 'stable'
 
     - name: Clean & Create Android
       run: |
         rm -rf android
         flutter create --project-name zing_call --platforms android .
-        
-        # Zego ke liye Minimum SDK 21
         sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
         sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
 
@@ -32,6 +33,11 @@ jobs:
         sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>\n    <uses-permission android:name="android.permission.BLUETOOTH"/>\n    <uses-permission android:name="android.permission.VIBRATE"/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"/>' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
+
+    # 🔥 SUPER FAST JCENTER FIX (Takes only 2 seconds instead of 10 minutes)
+    - name: Strip Bad ZegoCloud Code
+      run: grep -rl 'jcenter()' ~/.pub-cache/hosted/pub.dev/ | xargs sed -i 's/jcenter()/mavenCentral()/g' || true
+
     - run: flutter build apk --release --no-tree-shake-icons
 
     - uses: actions/upload-artifact@v4
