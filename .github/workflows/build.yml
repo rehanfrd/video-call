@@ -16,34 +16,28 @@ jobs:
         java-version: '17'
     - uses: subosito/flutter-action@v2
       with:
-        channel: 'stable' # Ab hum latest Flutter use karenge, old version ki zarurat nahi!
-    
-    - name: Setup Android & Permissions
+        channel: 'stable'
+
+    - name: Setup Android Config
       run: |
         rm -rf android
         flutter create --project-name zing_call --platforms android .
-        
-        # 🔥 Zego ke naye plugins ko SDK 35 chahiye hota hai, hum forcefully set kar rahe hain:
         sed -i -E 's/compileSdk = .*/compileSdk = 35/g' android/app/build.gradle || true
         sed -i -E 's/flutter\.compileSdkVersion/35/g' android/app/build.gradle || true
-        
-        # 🔥 Minimum SDK 21 set kar rahe hain
         sed -i -E 's/minSdk = .*/minSdk = 21/g' android/app/build.gradle || true
         sed -i -E 's/flutter\.minSdkVersion/21/g' android/app/build.gradle || true
-        
-        # 🔥 Camera & Mic Permissions
+
+    - name: Add Permissions
+      run: |
         sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
-    
-    - name: 🔥 GOD MODE FIX: Strip Bad ZegoCloud Code
-      run: |
-        # Zego ke purane packages me 'jcenter()' hota hai jo aajkal crash karta hai.
-        # Ye command pub-cache ke andar jaakar sab jagah se jcenter ko mavenCentral se replace kar degi!
-        find ~/.pub-cache -name "*.gradle" -type f -exec sed -i 's/jcenter()/mavenCentral()/g' {} +
-        
+
+    - name: Strip Bad ZegoCloud Code
+      run: find ~/.pub-cache -name "*.gradle" -type f -exec sed -i 's/jcenter()/mavenCentral()/g' {} +
+
     - run: flutter build apk --release --no-tree-shake-icons
-    
+
     - uses: actions/upload-artifact@v4
       with:
         name: ZingCall-App
