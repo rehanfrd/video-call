@@ -22,10 +22,13 @@ jobs:
     - name: Setup Android & Permissions
       run: |
         rm -rf android
-        # Yahan humne explicit project name 'zing_call' add kar diya hai:
         flutter create --project-name zing_call --platforms android .
         
-        # ZegoCloud ke liye minimum SDK config
+        # 🔥 Kotlin Version Upgrade (Fixes the compilation error)
+        sed -i 's/version "1.7.1" apply false/version "1.9.24" apply false/g' android/settings.gradle || true
+        sed -i "s/ext.kotlin_version = '1.7.1'/ext.kotlin_version = '1.9.24'/g" android/build.gradle || true
+        
+        # ZegoCloud minimum SDK config
         sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
         sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
         
