@@ -9,7 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  zego_uikit_prebuilt_call: ^4.1.9
+  # Yahan se humne '^' hata diya hai, taaki ye strictly stable version use kare
+  zego_uikit_prebuilt_call: 4.1.9
 
 flutter:
   uses-material-design: true
