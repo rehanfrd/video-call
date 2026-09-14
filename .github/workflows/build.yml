@@ -24,14 +24,19 @@ jobs:
         rm -rf android
         flutter create --project-name zing_call --platforms android .
         
-        # 🔥 1. Advance Fix for Kotlin Version (Forces 1.9.24 no matter what old version is there)
-        sed -i -E 's/id "org.jetbrains.kotlin.android" version ".*" apply false/id "org.jetbrains.kotlin.android" version "1.9.24" apply false/g' android/settings.gradle
+        # 🔥 Kotlin Version Update to 2.1.0
+        sed -i -E 's/id "org.jetbrains.kotlin.android" version ".*" apply false/id "org.jetbrains.kotlin.android" version "2.1.0" apply false/g' android/settings.gradle
+        sed -i "s/ext.kotlin_version = '.*'/ext.kotlin_version = '2.1.0'/g" android/build.gradle || true
         
-        # 🔥 2. Advance Fix for minSdk 21 (Catches all possible flutter formats)
+        # 🔥 Android SDK Update to 35
+        sed -i -E 's/compileSdkVersion .*/compileSdkVersion 35/g' android/app/build.gradle
+        sed -i -E 's/flutter\.compileSdkVersion/35/g' android/app/build.gradle
+        
+        # 🔥 minSdk Update to 21
         sed -i -E 's/flutter\.minSdkVersion|minSdk = .*/minSdk = 21/g' android/app/build.gradle
         sed -i -E 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle
         
-        # 🔥 3. Inject Camera & Mic Permissions directly below <manifest> tag
+        # 🔥 Camera & Mic Permissions
         sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
