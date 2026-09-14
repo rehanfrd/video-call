@@ -24,10 +24,20 @@ jobs:
         rm -rf android
         flutter create --project-name zing_call --platforms android .
 
-    - name: Update MinSDK
+    - name: Fix Android Configs for ZegoCloud (CompileSDK & Kotlin)
       run: |
+        # 1. Update minSdk to 21
         find android -name "build.gradle" -type f -exec sed -i 's/flutter.minSdkVersion/21/g' {} + || true
         find android -name "build.gradle" -type f -exec sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' {} + || true
+        
+        # 2. Force CompileSdk to 34 (Crucial for ZegoCloud)
+        find android -name "build.gradle" -type f -exec sed -i 's/flutter.compileSdkVersion/34/g' {} + || true
+        find android -name "build.gradle" -type f -exec sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 34/g' {} + || true
+        find android -name "build.gradle" -type f -exec sed -i 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/g' {} + || true
+        
+        # 3. Update Kotlin Version to 1.9.0 in settings.gradle
+        sed -i 's/id "org.jetbrains.kotlin.android" version ".*"/id "org.jetbrains.kotlin.android" version "1.9.0"/g' android/settings.gradle || true
+        find android -name "build.gradle" -type f -exec sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.0"/g' {} + || true
 
     - name: Add Safe Permissions
       run: |
