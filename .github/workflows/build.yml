@@ -26,10 +26,19 @@ jobs:
 
     - name: Fix Android Configs for ZegoCloud
       run: |
+        # Fix minSdk
         find android -name "build.gradle" -type f -exec sed -i 's/flutter.minSdkVersion/21/g' {} + || true
         find android -name "build.gradle" -type f -exec sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' {} + || true
+        
+        # Fix compileSdk
         find android -name "build.gradle" -type f -exec sed -i 's/flutter.compileSdkVersion/34/g' {} + || true
         find android -name "build.gradle" -type f -exec sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 34/g' {} + || true
+        
+        # 🔥 Fix targetSdk (Yeh miss ho gaya tha)
+        find android -name "build.gradle" -type f -exec sed -i 's/flutter.targetSdkVersion/34/g' {} + || true
+        find android -name "build.gradle" -type f -exec sed -i 's/targetSdk = flutter.targetSdkVersion/targetSdk = 34/g' {} + || true
+        
+        # Fix Kotlin
         sed -i 's/id "org.jetbrains.kotlin.android" version ".*"/id "org.jetbrains.kotlin.android" version "1.9.0"/g' android/settings.gradle || true
         find android -name "build.gradle" -type f -exec sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.0"/g' {} + || true
 
@@ -39,7 +48,6 @@ jobs:
 
     - run: flutter pub get
 
-    # 🔥 THE REAL MAGIC FIX: Corrected folder path to inject namespace!
     - name: Fix Missing Namespaces in Pub Cache
       run: |
         for manifest in $(find ~/.pub-cache/hosted/pub.dev/ -name AndroidManifest.xml); do
