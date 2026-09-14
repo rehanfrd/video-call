@@ -9,8 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # ZegoCloud Calling Package
-  zego_uikit_prebuilt_call: ^4.1.9
+  # Yahan se '^' hata diya hai taaki exact stable version (4.1.9) hi use ho
+  zego_uikit_prebuilt_call: 4.1.9
 
 flutter:
   uses-material-design: true
