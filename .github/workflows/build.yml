@@ -16,6 +16,7 @@ jobs:
         java-version: '17'
     - uses: subosito/flutter-action@v2
       with:
+        flutter-version: '3.19.6' # Yeh line ZegoCloud ke errors ko fix karegi
         channel: 'stable'
     
     - name: Setup Android & Permissions
@@ -23,7 +24,7 @@ jobs:
         rm -rf android
         flutter create --platforms android .
         
-        # ZegoCloud ke liye minimum SDK 21 chahiye
+        # ZegoCloud ke liye minimum SDK config
         sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
         sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
         
