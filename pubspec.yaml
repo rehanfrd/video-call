@@ -11,9 +11,5 @@ dependencies:
     sdk: flutter
   zego_uikit_prebuilt_call: 4.1.9
 
-# 🔥 YEH HAI ASLI FIX JO KOTLIN ERROR KO JAD SE KHATAM KAREGA 🔥
-dependency_overrides:
-  is_lock_screen2: 2.0.2
-
 flutter:
   uses-material-design: true
