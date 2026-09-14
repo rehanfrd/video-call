@@ -39,16 +39,17 @@ jobs:
 
     - run: flutter pub get
 
-    # 🔥 THE MAGIC FIX: Ye automatically saare missing namespaces ko fix kar dega!
+    # 🔥 THE REAL MAGIC FIX: Corrected folder path to inject namespace!
     - name: Fix Missing Namespaces in Pub Cache
       run: |
         for manifest in $(find ~/.pub-cache/hosted/pub.dev/ -name AndroidManifest.xml); do
-          dir=$(dirname "$manifest")
-          build_gradle="$dir/build.gradle"
+          android_dir=$(echo "$manifest" | sed 's|/src/main/AndroidManifest.xml||')
+          build_gradle="$android_dir/build.gradle"
           if [ -f "$build_gradle" ] && ! grep -q "namespace" "$build_gradle"; then
             pkg=$(grep -oP 'package="\K[^"]+' "$manifest" | head -n 1)
             if [ -n "$pkg" ]; then
-              sed -i "/android {/a \    namespace '$pkg'" "$build_gradle"
+              echo "" >> "$build_gradle"
+              echo "android { namespace '$pkg' }" >> "$build_gradle"
             fi
           fi
         done
