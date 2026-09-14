@@ -24,16 +24,15 @@ jobs:
         rm -rf android
         flutter create --project-name zing_call --platforms android .
         
-        # 🔥 Kotlin Version Upgrade (Fixes the compilation error)
-        sed -i 's/version "1.7.1" apply false/version "1.9.24" apply false/g' android/settings.gradle || true
-        sed -i "s/ext.kotlin_version = '1.7.1'/ext.kotlin_version = '1.9.24'/g" android/build.gradle || true
+        # 🔥 1. Advance Fix for Kotlin Version (Forces 1.9.24 no matter what old version is there)
+        sed -i -E 's/id "org.jetbrains.kotlin.android" version ".*" apply false/id "org.jetbrains.kotlin.android" version "1.9.24" apply false/g' android/settings.gradle
         
-        # ZegoCloud minimum SDK config
-        sed -i 's/flutter.minSdkVersion/21/g' android/app/build.gradle || true
-        sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' android/app/build.gradle || true
+        # 🔥 2. Advance Fix for minSdk 21 (Catches all possible flutter formats)
+        sed -i -E 's/flutter\.minSdkVersion|minSdk = .*/minSdk = 21/g' android/app/build.gradle
+        sed -i -E 's/minSdkVersion .*/minSdkVersion 21/g' android/app/build.gradle
         
-        # Camera & Mic Permissions
-        sed -i '/<application/i \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />' android/app/src/main/AndroidManifest.xml
+        # 🔥 3. Inject Camera & Mic Permissions directly below <manifest> tag
+        sed -i '/<manifest/a \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.CAMERA"/>\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>' android/app/src/main/AndroidManifest.xml
 
     - run: flutter pub get
     - run: flutter build apk --release --no-tree-shake-icons
